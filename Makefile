@@ -1,18 +1,29 @@
 IVERILOG ?= iverilog
 VVP ?= vvp
-RTL := rtl/core/n64oc_top.sv rtl/core/n64oc_pkg.sv rtl/bus/n64oc_bus.sv
-TB := sim/tb_n64oc_top.sv
 
-.PHONY: all lint sim clean
+RTL_COMMON := rtl/core/n64oc_top.sv rtl/core/n64oc_pkg.sv rtl/bus/n64oc_bus.sv rtl/video/n64oc_test_video.sv
+CPU_RTL := rtl/cpu/n64oc_mips_core.sv
+TOP_TB := sim/tb_n64oc_top.sv
+CPU_TB := sim/tb_n64oc_mips_core.sv
+
+.PHONY: all lint sim test-cpu test-top clean
+
 all: lint sim
 
 lint:
-	$(IVERILOG) -g2012 -t null $(RTL)
+	$(IVERILOG) -g2012 -t null $(RTL_COMMON) $(CPU_RTL)
 
-sim:
+sim: test-cpu test-top
+
+test-cpu:
 	mkdir -p build
-	$(IVERILOG) -g2012 -o build/n64oc_tb $(RTL) $(TB)
-	$(VVP) build/n64oc_tb
+	$(IVERILOG) -g2012 -o build/n64oc_cpu_tb $(CPU_RTL) $(CPU_TB)
+	$(VVP) build/n64oc_cpu_tb
+
+test-top:
+	mkdir -p build
+	$(IVERILOG) -g2012 -o build/n64oc_top_tb $(RTL_COMMON) $(TOP_TB)
+	$(VVP) build/n64oc_top_tb
 
 clean:
 	rm -rf build
