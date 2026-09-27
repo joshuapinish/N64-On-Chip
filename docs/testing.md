@@ -1,15 +1,15 @@
 # Testing and bring-up
 
-The project intentionally has two different kinds of tests.
+The project has two immediate, reproducible tests plus a path toward real ROM boot.
 
 ## 1. CPU smoke test
 
-This is a self-contained MIPS execution test. It does not require a Nintendo ROM.
+This self-contained MIPS execution test requires no Nintendo ROM.
 
-On a Linux machine with Icarus Verilog:
+On Void Linux:
 
 ```bash
-sudo xbps-install -S iverilog   # Void Linux
+sudo xbps-install -S iverilog
 make test-cpu
 ```
 
@@ -19,7 +19,7 @@ Expected result:
 MIPS smoke test passed: r1=0000000000001234 r2=0000000000001234 r3=0000000000002468
 ```
 
-This proves that the current experimental CPU can fetch instructions, execute integer operations, perform a 64-bit store/load, and halt.
+It proves that the experimental CPU can fetch instructions, execute integer operations, perform a 64-bit store/load, and halt.
 
 ## 2. Video bring-up
 
@@ -29,46 +29,45 @@ The top-level currently drives a deterministic 640x480 diagnostic pattern:
 - white center rectangle
 - generated HSYNC/VSYNC
 
-The top-level clock is intended to be supplied by a suitable pixel-clock source. A real FPGA target will need a PLL/MMCM or equivalent clock wrapper for the board's oscillator.
+A real FPGA target will need a PLL/MMCM or equivalent clock wrapper for the board oscillator.
 
-Run the simulation with:
+Run:
 
 ```bash
 make test-top
 ```
 
-## 3. Mario 64 target
+## 3. Cartridge ROM interface
 
-The repository does **not** include Super Mario 64, the N64 PIF boot ROM, or other Nintendo copyrighted firmware.
+The next test boundary is an external ROM image supplied to simulation or FPGA storage.
 
-A real Mario 64 title-screen boot requires much more than the current CPU smoke test. The boot chain initializes hardware, copies IPL2 into RSP memory, validates IPL3 and then enters the cartridge program. The N64 IPL stages are documented by the open N64-IPL project. citeturn0search11
-
-The intended test interface is therefore:
+The repository must never contain commercial game ROMs or proprietary boot images. The intended architecture is:
 
 ```text
-legal ROM dump
-     |
-     v
-SD/ROM loader
-     |
-     v
-cartridge address space
-     |
-     +--> CPU / RSP / RDP / VI / AI / SI / PIF
+legal ROM image
+      |
+      v
+SD / flash / simulation loader
+      |
+      v
+N64 cartridge address space
+      |
+      +--> CPU / RSP / RDP / peripherals
 ```
 
-Do not commit a ROM or proprietary boot image to this repository. The loader should accept an external image supplied by the user.
+## 4. Mario 64 title-screen milestone
 
-## Compatibility milestone
+Reaching the actual Super Mario 64 title screen is a substantially larger milestone. The N64 boot chain initializes hardware, moves IPL2 into RSP memory, validates IPL3, initializes RDRAM/caches and then enters the cartridge program. The open N64-IPL project documents those stages and expects matching binary inputs for testing.
 
-The first meaningful console milestone is:
+Therefore the project will not fake a claim of Mario 64 compatibility. The first real Mario milestone is:
 
-1. CPU reset and PIF/boot path.
-2. RDRAM initialization.
-3. Cartridge ROM mapping.
-4. IPL3 entry.
-5. ROM entrypoint execution.
-6. VI scanout.
-7. RSP/RDP support sufficient for the Mario 64 title screen.
+1. CPU reset path.
+2. PIF/boot interface.
+3. RDRAM model.
+4. Cartridge ROM mapping.
+5. IPL3 execution.
+6. RSP scalar/vector support.
+7. VI scanout.
+8. RDP support sufficient for the title screen.
 
-Only after that should the project claim that Mario 64 boots.
+Only after these stages work with an external, legally obtained ROM should the repository claim that Mario 64 reaches its title screen.
