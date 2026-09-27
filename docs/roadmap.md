@@ -5,9 +5,14 @@
 - [x] SystemVerilog package
 - [x] Initial bus interface
 - [x] Top-level smoke test
-- [ ] CI with Icarus/Verilator
+- [x] CI with Icarus/Verilator
+- [x] CPU instruction smoke test
+- [x] Cartridge ROM smoke test
+- [x] Video bring-up pattern
 
 ## M1 CPU
+
+Status: **in progress**
 - [ ] Integer register file
 - [ ] Fetch/decode
 - [ ] ALU
