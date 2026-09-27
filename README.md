@@ -1,2 +1,3 @@
 # N64-On-Chip
-NOAC But is for N64 (Test with Chat gpt Ai)
+
+Personal FPGA/SoC research project for a software-compatible N64-like system.
