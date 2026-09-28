@@ -14,14 +14,11 @@ module n64oc_rdram #(
 
   localparam int WORDS = BYTES / 8;
   logic [63:0] mem [0:WORDS-1];
-  integer i;
 
   always_ff @(posedge clk or negedge reset_n) begin
     if (!reset_n) begin
       ready <= 1'b0;
       rdata <= 64'd0;
-      for (i = 0; i < WORDS; i = i + 1)
-        mem[i] <= 64'd0;
     end else begin
       ready <= valid;
       if (valid && (addr[31:3] < WORDS)) begin
