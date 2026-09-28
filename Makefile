@@ -34,7 +34,7 @@ test-top:
 
 test-soc:
 	mkdir -p build
-	$(IVERILOG) -g2012 -o build/n64oc_soc_tb -P n64oc_soc.BOOT_ROM_HEX=\"sim/data/boot_test.hex\" $(SOC_RTL) $(SOC_TB)
+	$(IVERILOG) -g2012 -o build/n64oc_soc_tb $(SOC_RTL) $(SOC_TB)
 	$(VVP) build/n64oc_soc_tb
 
 clean:
