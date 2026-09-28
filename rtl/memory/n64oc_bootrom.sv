@@ -10,8 +10,6 @@ module n64oc_bootrom #(
   output logic [63:0] rdata
 );
 
-  localparam logic [63:31] BOOT_BASE = 33'h0; // documentation-only placeholder
-
   logic [31:0] rom [0:WORDS-1];
   integer i;
   integer word_index;
