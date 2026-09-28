@@ -3,17 +3,19 @@ VVP ?= vvp
 
 RTL_COMMON := rtl/core/n64oc_top.sv rtl/core/n64oc_pkg.sv rtl/bus/n64oc_bus.sv rtl/video/n64oc_test_video.sv
 CPU_RTL := rtl/cpu/n64oc_mips_core.sv
+SOC_RTL := $(CPU_RTL) rtl/core/n64oc_soc.sv rtl/memory/n64oc_bootrom.sv rtl/memory/n64oc_rdram.sv
 TOP_TB := sim/tb_n64oc_top.sv
 CPU_TB := sim/tb_n64oc_mips_core.sv
+SOC_TB := sim/tb_n64oc_soc.sv
 
-.PHONY: all lint sim test-cpu test-cart test-top clean
+.PHONY: all lint sim test-cpu test-cart test-top test-soc clean
 
 all: lint sim
 
 lint:
-	$(IVERILOG) -g2012 -t null $(RTL_COMMON) $(CPU_RTL)
+	$(IVERILOG) -g2012 -t null $(RTL_COMMON) $(SOC_RTL)
 
-sim: test-cpu test-cart test-top
+sim: test-cpu test-cart test-top test-soc
 
 test-cpu:
 	mkdir -p build
@@ -29,6 +31,11 @@ test-top:
 	mkdir -p build
 	$(IVERILOG) -g2012 -o build/n64oc_top_tb $(RTL_COMMON) $(TOP_TB)
 	$(VVP) build/n64oc_top_tb
+
+test-soc:
+	mkdir -p build
+	$(IVERILOG) -g2012 -o build/n64oc_soc_tb -P n64oc_soc.BOOT_ROM_HEX=\"sim/data/boot_test.hex\" $(SOC_RTL) $(SOC_TB)
+	$(VVP) build/n64oc_soc_tb
 
 clean:
 	rm -rf build
